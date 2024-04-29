@@ -1,13 +1,14 @@
 package nextstep.courses.domain;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import nextstep.courses.CannotRegisterException;
 import nextstep.payments.domain.Payment;
 import nextstep.users.domain.NsUser;
 
 public class Session {
 
-    private final long id;
+    private final Long id;
     private String title;
     private SessionDuration sessionDuration;
     private SessionType sessionType;
@@ -55,8 +56,40 @@ public class Session {
         }
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Map<String, LocalDateTime> getSessionDuration() {
+        return sessionDuration.getSessionDuration();
+    }
+
+    public String getSessionType() {
+        return sessionType.name();
+    }
+
+    public String getState() {
+        return state.name();
+    }
+
+    public String getImage() {
+        return image.getImage();
+    }
+
+    public Enrollment getEnrollment() {
+        return enrollment;
+    }
+
+    public Long getCourse() {
+        return course.getId();
+    }
+
     public static class Builder {
-        private final long id;
+        private final Long id;
         private String title;
         private SessionDuration sessionDuration;
         private SessionType sessionType;
@@ -65,7 +98,7 @@ public class Session {
         private Course course;
         private Enrollment enrollment;
 
-        public Builder(long id) {
+        public Builder(Long id) {
             this.id = id;
         }
 
@@ -96,6 +129,11 @@ public class Session {
 
         public Builder enrollment(Enrollment enrollment) {
             this.enrollment = enrollment;
+            return this;
+        }
+
+        public Builder course(Course course) {
+            this.course = course;
             return this;
         }
 

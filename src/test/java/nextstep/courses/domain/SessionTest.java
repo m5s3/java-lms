@@ -46,24 +46,17 @@ class SessionTest {
 
     @Test
     void 무료강의_신청_모집중_이외에는_예외발생() {
-        LocalDateTime now = LocalDateTime.now();
         Session session1 = new Session.Builder(1L)
-                .title("lms")
                 .sessionType(SessionType.FREE)
-                .image(image)
                 .state(SessionState.READY)
-                .sessionDuration(now.plusDays(5), now.plusDays(30))
                 .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
                 .build();
         assertThatThrownBy(() -> session1.register(NsUserTest.JAVAJIGI))
                 .isInstanceOf(CannotRegisterException.class);
 
         Session session2 = new Session.Builder(1L)
-                .title("lms")
                 .sessionType(SessionType.FREE)
-                .image(image)
                 .state(SessionState.END)
-                .sessionDuration(now.plusDays(5), now.plusDays(30))
                 .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
                 .build();
         assertThatThrownBy(() -> session2.register(NsUserTest.JAVAJIGI))
@@ -76,11 +69,8 @@ class SessionTest {
         int expected = 1;
 
         Session session = new Session.Builder(1L)
-                .title("lms")
                 .sessionType(SessionType.PAID)
-                .image(image)
                 .state(SessionState.RECRUITING)
-                .sessionDuration(now.plusDays(5), now.plusDays(30))
                 .enrollment(Enrollment.createPaidEnrollment(new Students(new ArrayList<>()), 10, 5_000))
                 .build();
         Payment payment = new Payment("1", 1L, NsUserTest.JAVAJIGI.getId(), 5_000L);

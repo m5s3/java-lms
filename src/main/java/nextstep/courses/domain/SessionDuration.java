@@ -1,6 +1,8 @@
 package nextstep.courses.domain;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SessionDuration {
 
@@ -11,6 +13,13 @@ public class SessionDuration {
         validate(startDate, endDate);
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public Map<String , LocalDateTime> getSessionDuration() {
+        HashMap<String, LocalDateTime> sessionDuration = new HashMap<>();
+        sessionDuration.put("startDate", startDate);
+        sessionDuration.put("endDate", endDate);
+        return sessionDuration;
     }
 
     private void validate(LocalDateTime startDate, LocalDateTime endDate) {

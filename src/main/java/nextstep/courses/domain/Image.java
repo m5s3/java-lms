@@ -16,9 +16,17 @@ public class Image {
         this(imageUrl, new ImageMeta(width, height, fileSize, extractExtension(imageUrl)));
     }
 
+    public Image(String imageUrl) {
+        this(imageUrl, null);
+    }
+
     public Image(String imageUrl, ImageMeta imageMeta) {
         this.imageUrl = imageUrl;
         this.imageMeta = imageMeta;
+    }
+
+    public String getImage() {
+        return imageUrl;
     }
 
     private static String extractExtension(String text) {
