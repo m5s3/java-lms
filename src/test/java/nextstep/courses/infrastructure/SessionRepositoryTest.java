@@ -59,6 +59,8 @@ class SessionRepositoryTest {
 
         assertThat(count).isEqualTo(expected);
         Session savedSession = sessionRepository.findById(1L);
-        LOGGER.debug("Course: {}", savedSession);
+        assertThat(savedSession.getId()).isEqualTo(session.getId());
+
+        LOGGER.debug("Session: {}", savedSession);
     }
 }

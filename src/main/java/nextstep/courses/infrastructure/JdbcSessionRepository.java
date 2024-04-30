@@ -7,6 +7,8 @@ import nextstep.courses.domain.Course;
 import nextstep.courses.domain.Image;
 import nextstep.courses.domain.Session;
 import nextstep.courses.domain.SessionRepository;
+import nextstep.courses.domain.SessionState;
+import nextstep.courses.domain.SessionType;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -35,50 +37,34 @@ public class JdbcSessionRepository implements SessionRepository {
                 session.getSessionType());
     }
 
-    /**
-     *
-     * public Course findById(Long id) {
-     *         String sql = "select id, title, creator_id, created_at, updated_at from course where id = ?";
-     *         RowMapper<Course> rowMapper = (rs, rowNum) -> new Course(
-     *                 rs.getLong(1),
-     *                 rs.getString(2),
-     *                 rs.getLong(3),
-     *                 toLocalDateTime(rs.getTimestamp(4)),
-     *                 toLocalDateTime(rs.getTimestamp(5)));
-     *         return jdbcTemplate.queryForObject(sql, rowMapper, id);
-     *     }
-     *
-     *     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
-     *         if (timestamp == null) {
-     *             return null;
-     *         }
-     *         return timestamp.toLocalDateTime();
-     *     }
-     * @param id
-     * @return
-     */
     @Override
     public Session findById(Long id) {
-        String sql = "select s.id, s.title, s.image, s.start_date"
-                    + ",s.end_date, s.state, s.type"
-                    + ",c.id, c.title, c.creator_id, c.created_at"
-                    + "from session s "
-                    + "JOIN course c"
-                    + "ON s.course_id = c.id"
-                    + "WHERE id = ?";
+        String sql = "select s.id as session_id, s.title, s.image, s.start_date "
+                    + ",s.end_date, s.state, s.type "
+                    + ",c.id as course_id, c.title as course_title, c.creator_id, c.created_at as course_created_at "
+                    + "from session as s "
+                    + "JOIN course as c "
+                    + "ON s.course_id = c.id "
+                    + "WHERE s.id = ?";
         RowMapper<Session> rowMapper = (rs, rowNum) -> {
-            Course course = new Course(rs.getLong("c.id"), rs.getString("c.title"),
-                    rs.getLong("c.creator_id"), toLocalDateTime(rs.getTimestamp("c.created_at")),
+            Course course = new Course(rs.getLong("course_id"), rs.getString("course_title"),
+                    rs.getLong("creator_id"), toLocalDateTime(rs.getTimestamp("course_created_at")),
                     null);
-            return  new Session.Builder(rs.getLong("s.id"))
-                    .title(rs.getString("s.title"))
-                    .image(new Image(rs.getString("s.image")))
-                    .sessionDuration(toLocalDateTime(rs.getTimestamp("s.start_date")), toLocalDateTime(rs.getTimestamp("s.end_date")))
-                    .course(course)
-                    .sessionType();
 
+            SessionType sessionType = SessionType.findType(rs.getString("type"));
+            SessionState state = SessionState.findState(rs.getString("state"));
+
+            return new Session.Builder(rs.getLong("session_id"))
+                    .title(rs.getString("title"))
+                    .image(new Image(rs.getString("image")))
+                    .sessionDuration(toLocalDateTime(rs.getTimestamp("start_date")),
+                            toLocalDateTime(rs.getTimestamp("end_date")))
+                    .course(course)
+                    .sessionType(sessionType)
+                    .state(state)
+                    .build();
         };
-        return null;
+        return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {

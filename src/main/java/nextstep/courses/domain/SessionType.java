@@ -1,5 +1,7 @@
 package nextstep.courses.domain;
 
+import java.util.Arrays;
+
 public enum SessionType {
 
     PAID("유료강의"),
@@ -16,7 +18,10 @@ public enum SessionType {
         return this == PAID;
     }
 
-    public SessionType findType(String type) {
-
+    public static SessionType findType(String type) {
+        return Arrays.stream(values())
+                .filter(sessionType -> sessionType.name().toLowerCase().equals(type))
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
