@@ -35,4 +35,16 @@ public class CourseRepositoryTest {
         assertThat(course.getTitle()).isEqualTo(savedCourse.getTitle());
         LOGGER.debug("Course: {}", savedCourse);
     }
+
+    @Test
+    void findWithSessionsById_테스트() {
+        Course course = courseRepository.findWithSessionsById(1L);
+        LOGGER.debug("Course: {}", course);
+        assertThat(course.countOfSession()).isEqualTo(3);
+    }
+
+    @Test
+    void 수강_등록() {
+
+    }
 }

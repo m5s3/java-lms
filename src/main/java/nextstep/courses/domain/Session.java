@@ -8,7 +8,7 @@ import nextstep.users.domain.NsUser;
 
 public class Session {
 
-    private final Long id;
+    private Long id;
     private String title;
     private SessionDuration sessionDuration;
     private SessionType sessionType;
@@ -64,6 +64,10 @@ public class Session {
         return title;
     }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     public Map<String, LocalDateTime> getSessionDuration() {
         return sessionDuration.getSessionDuration();
     }
@@ -86,6 +90,13 @@ public class Session {
 
     public Long getCourse() {
         return course.getId();
+    }
+
+    public void updateId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException();
+        }
+        this.id = id;
     }
 
     public static class Builder {
