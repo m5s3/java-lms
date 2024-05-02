@@ -30,7 +30,7 @@ class CourseTest {
                 .image(image)
                 .state(SessionState.RECRUITING)
                 .sessionDuration(now.plusDays(5), now.plusDays(30))
-                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), LocalDateTime.now(), null))
                 .build();
 
         Session session2 = new Session.Builder(2L)
@@ -39,7 +39,7 @@ class CourseTest {
                 .image(image)
                 .state(SessionState.RECRUITING)
                 .sessionDuration(now.plusDays(5), now.plusDays(30))
-                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), LocalDateTime.now(), null))
                 .build();
 
         course.add(session1);
@@ -58,7 +58,7 @@ class CourseTest {
                 .image(image)
                 .state(SessionState.RECRUITING)
                 .sessionDuration(now.plusDays(5), now.plusDays(30))
-                .enrollment(Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 10, 5_000))
+                .enrollment(Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 10, 5_000, LocalDateTime.now(), null))
                 .build();
         course.add(session);
 

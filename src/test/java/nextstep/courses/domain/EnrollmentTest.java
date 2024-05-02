@@ -3,6 +3,7 @@ package nextstep.courses.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import nextstep.courses.CannotRegisterException;
@@ -19,7 +20,7 @@ class EnrollmentTest {
 
     @BeforeEach
     void setUp() {
-        enrollment = Enrollment.createPaidEnrollment(new Students(new ArrayList<>()), 1, 1_000);
+        enrollment = Enrollment.createPaidEnrollment(new Students(new ArrayList<>()), 1, 1_000, LocalDateTime.now(), null);
     }
 
     @Test
@@ -42,7 +43,7 @@ class EnrollmentTest {
 
     @Test
     void 등록_수강인원_예외() {
-        enrollment = Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 1, 1_000);
+        enrollment = Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 1, 1_000, LocalDateTime.now(), null);
         Payment payment = new Payment("0", 0L, NsUserTest.JAVAJIGI.getId(), 1_000L);
 
         assertThatThrownBy(() -> {
@@ -54,7 +55,7 @@ class EnrollmentTest {
     @ParameterizedTest
     @ValueSource(longs = {0L, 999L, 1_001L})
     void 등록_수강료_예외(long fee) {
-        enrollment = Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 1, 1_000);
+        enrollment = Enrollment.createPaidEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), 1, 1_000, LocalDateTime.now(), null);
         Payment invalidPayment = new Payment("0", 0L, NsUserTest.JAVAJIGI.getId(), fee);
 
         assertThatThrownBy(() -> {

@@ -25,6 +25,10 @@ public class NsUser {
     public NsUser() {
     }
 
+    public NsUser(Long id) {
+        this(id, null, null, null, null, null, null);
+    }
+
     public NsUser(Long id, String userId, String password, String name, String email) {
         this(id, userId, password, name, email, LocalDateTime.now(), null);
     }

@@ -1,31 +1,62 @@
 package nextstep.courses.domain;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
 import nextstep.courses.CannotRegisterException;
 import nextstep.payments.domain.Payment;
 import nextstep.users.domain.NsUser;
 
 public class Enrollment {
 
+    private Long id;
+
     private Students students;
     private int studentCapacity;
     private Money fee;
 
-    private Enrollment(Students students) {
-        this(students, 0, 0);
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private Enrollment(Students students, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this(students, 0, 0, createdAt, updatedAt);
     }
 
-    private Enrollment(Students students, int studentCapacity, long fee) {
+    private Enrollment(Students students, int studentCapacity, long fee, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.students = students;
         this.studentCapacity = studentCapacity;
         this.fee = new Money(fee);
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public static Enrollment createFreeEnrollment(Students students) {
-        return new Enrollment(students);
+    public Students getStudents() {
+        return students;
     }
 
-    public static Enrollment createPaidEnrollment(Students students, int studentCapacity, long fee) {
-        return new Enrollment(students, studentCapacity, fee);
+    public int getStudentCapacity() {
+        return studentCapacity;
+    }
+
+    public long getFee() {
+        if (Objects.isNull(fee)) {
+            return 0;
+        }
+        return fee.longValue();
+    }
+
+    public static Enrollment createFreeEnrollment(Students students, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        return new Enrollment(students, 0, 0, createdAt, updatedAt);
+    }
+
+    public static Enrollment createPaidEnrollment(Students students, int studentCapacity, long fee, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        return new Enrollment(students, studentCapacity, fee, createdAt, updatedAt);
+    }
+
+    public static Enrollment createEnrollment(Students students, int studentCapacity, long fee, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        if (studentCapacity > 0 && fee > 0) {
+            return createPaidEnrollment(students, studentCapacity, fee, createdAt, updatedAt);
+        }
+        return createFreeEnrollment(students, createdAt, updatedAt);
     }
 
     public void enroll(NsUser student) {
@@ -48,5 +79,9 @@ public class Enrollment {
 
     private boolean isFull() {
         return studentCapacity == students.size();
+    }
+
+    public void updateId(long id) {
+        this.id = id;
     }
 }

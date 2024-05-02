@@ -35,7 +35,7 @@ class SessionTest {
                 .image(image)
                 .state(SessionState.RECRUITING)
                 .sessionDuration(now.plusDays(5), now.plusDays(30))
-                .enrollment(Enrollment.createFreeEnrollment(new Students(new ArrayList<>())))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(new ArrayList<>()), LocalDateTime.now(), null))
                 .build();
 
         session.register(NsUserTest.JAVAJIGI);
@@ -49,7 +49,7 @@ class SessionTest {
         Session session1 = new Session.Builder(1L)
                 .sessionType(SessionType.FREE)
                 .state(SessionState.READY)
-                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), LocalDateTime.now(), null))
                 .build();
         assertThatThrownBy(() -> session1.register(NsUserTest.JAVAJIGI))
                 .isInstanceOf(CannotRegisterException.class);
@@ -57,7 +57,7 @@ class SessionTest {
         Session session2 = new Session.Builder(1L)
                 .sessionType(SessionType.FREE)
                 .state(SessionState.END)
-                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI))))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(List.of(NsUserTest.JAVAJIGI)), LocalDateTime.now(), null))
                 .build();
         assertThatThrownBy(() -> session2.register(NsUserTest.JAVAJIGI))
                 .isInstanceOf(CannotRegisterException.class);
@@ -71,7 +71,7 @@ class SessionTest {
         Session session = new Session.Builder(1L)
                 .sessionType(SessionType.PAID)
                 .state(SessionState.RECRUITING)
-                .enrollment(Enrollment.createPaidEnrollment(new Students(new ArrayList<>()), 10, 5_000))
+                .enrollment(Enrollment.createPaidEnrollment(new Students(new ArrayList<>()), 10, 5_000, LocalDateTime.now(), null))
                 .build();
         Payment payment = new Payment("1", 1L, NsUserTest.JAVAJIGI.getId(), 5_000L);
         session.register(NsUserTest.JAVAJIGI, payment);

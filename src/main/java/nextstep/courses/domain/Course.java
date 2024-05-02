@@ -76,6 +76,10 @@ public class Course {
         this.sessions.register(sessionId, user, payment);
     }
 
+    public void updateId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Course{" +
@@ -85,5 +89,22 @@ public class Course {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Course)) {
+            return false;
+        }
+        Course course = (Course) o;
+        return this.id.equals(course.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, creatorId, sessions, createdAt, updatedAt);
     }
 }

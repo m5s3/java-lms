@@ -1,10 +1,16 @@
 package nextstep.courses.domain;
 
+import java.util.Objects;
+
 public class Money {
 
     private final long amount;
     public Money(long amount) {
         this.amount = amount;
+    }
+
+    public long longValue() {
+        return amount;
     }
 
     @Override

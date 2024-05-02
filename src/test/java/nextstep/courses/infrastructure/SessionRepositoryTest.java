@@ -55,7 +55,7 @@ class SessionRepositoryTest {
                 .image(image)
                 .state(SessionState.RECRUITING)
                 .sessionDuration(now.plusDays(5), now.plusDays(10))
-                .enrollment(Enrollment.createFreeEnrollment(new Students(new ArrayList<>())))
+                .enrollment(Enrollment.createFreeEnrollment(new Students(new ArrayList<>()), LocalDateTime.now(), null))
                 .course(course)
                 .build();
 
@@ -77,5 +77,6 @@ class SessionRepositoryTest {
         assertThatThrownBy(() -> sessionRepository.findById(findSession.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
 
+        LOGGER.debug("session = {}", session);
     }
 }

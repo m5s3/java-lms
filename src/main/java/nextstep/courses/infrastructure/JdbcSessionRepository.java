@@ -3,15 +3,21 @@ package nextstep.courses.infrastructure;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import nextstep.courses.domain.Course;
+import nextstep.courses.domain.Enrollment;
 import nextstep.courses.domain.Image;
 import nextstep.courses.domain.Session;
 import nextstep.courses.domain.SessionRepository;
 import nextstep.courses.domain.SessionState;
 import nextstep.courses.domain.SessionType;
+import nextstep.courses.domain.Students;
+import nextstep.payments.domain.Payment;
+import nextstep.users.domain.NsUser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
@@ -51,6 +57,9 @@ public class JdbcSessionRepository implements SessionRepository {
 
         long key = keyHolder.getKey().longValue();
         session.updateId(key);
+
+        saveEnrollment(session);
+
         return session;
     }
 
@@ -60,10 +69,16 @@ public class JdbcSessionRepository implements SessionRepository {
             String sql = "select s.id as session_id, s.title, s.image, s.start_date "
                     + ",s.end_date, s.state, s.type "
                     + ",c.id as course_id, c.title as course_title, c.creator_id, c.created_at as course_created_at "
+                    + ",e.fee, e.student_capacity "
+                    + ",es.student_id "
                     + "from session as s "
-                    + "JOIN course as c "
-                    + "ON s.course_id = c.id "
-                    + "WHERE s.id = ?";
+                    + "join course as c "
+                    + "on c.id = s.course_id "
+                    + "join enorllment as e "
+                    + "on e.session_id = s.id "
+                    + "left join enrollment_student as es "
+                    + "on es.enrollment_id = e.id "
+                    + "where s.id = ?";
             RowMapper<Session> rowMapper = (rs, rowNum) -> {
                 Course course = new Course(rs.getLong("course_id"), rs.getString("course_title"),
                         rs.getLong("creator_id"), toLocalDateTime(rs.getTimestamp("course_created_at")),
@@ -71,6 +86,16 @@ public class JdbcSessionRepository implements SessionRepository {
 
                 SessionType sessionType = SessionType.findType(rs.getString("type"));
                 SessionState state = SessionState.findState(rs.getString("state"));
+
+                Students students = new Students(List.of(new NsUser(rs.getLong("student_id"))));
+
+                while(rs.next()) {
+                    students.admit(new NsUser(rs.getLong("student_id")));
+                }
+
+                Enrollment enrollment = Enrollment.createEnrollment(students, rs.getInt("student_capacity"), rs.getLong("fee"),
+                        toLocalDateTime(rs.getTimestamp("created_at")),
+                        toLocalDateTime(rs.getTimestamp("updated_at")));
 
                 return new Session.Builder(rs.getLong("session_id"))
                         .title(rs.getString("title"))
@@ -80,6 +105,7 @@ public class JdbcSessionRepository implements SessionRepository {
                         .course(course)
                         .sessionType(sessionType)
                         .state(state)
+                        .enrollment(enrollment)
                         .build();
             };
             return jdbcTemplate.queryForObject(sql, rowMapper, id);
@@ -98,6 +124,33 @@ public class JdbcSessionRepository implements SessionRepository {
     public void delete(Long id) {
         String sql = "delete from session where id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void register(Long id, Long studentId) {
+
+    }
+
+    @Override
+    public void register(Long id, Long studentId, Payment payment) {
+
+    }
+
+    private Enrollment saveEnrollment(Session session) {
+        String sql = "insert into enrollment(student_capacity, fee, session_id) values(?, ?, ?)";
+        Enrollment enrollment = session.getEnrollment();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql,  new String[]{"id"});
+            ps.setInt(1, enrollment.getStudentCapacity());
+            ps.setLong(2, enrollment.getFee());
+            ps.setLong(3, session.getId());
+            return ps;
+        }, keyHolder);
+        long id = keyHolder.getKey().longValue();
+        enrollment.updateId(id);
+        return enrollment;
     }
 
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {

@@ -99,6 +99,10 @@ public class Session {
         this.id = id;
     }
 
+    public boolean isPaid() {
+        return sessionType.isPaid();
+    }
+
     public static class Builder {
         private final Long id;
         private String title;
@@ -120,6 +124,16 @@ public class Session {
 
         public Builder state(SessionState state) {
             this.state = state;
+            return this;
+        }
+
+        public Builder stateByString(String state) {
+            this.state = SessionState.findState(state);
+            return this;
+        }
+
+        public Builder typeByString(String type) {
+            this.sessionType = SessionType.findType(type);
             return this;
         }
 
